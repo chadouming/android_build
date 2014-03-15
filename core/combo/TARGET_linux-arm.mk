@@ -46,9 +46,32 @@ TARGET_GCC_VERSION_AND := 4.8
 TARGET_GCC_VERSION_ARM := 4.8
 
 # Define standard optimization flags:
+# Other AOSPAL authors add more here
+# The current custom AOSPAL optimization table is described as follows:
+# Currnet options are all disabled by default unless invoked by BoardConfig.mk or BoardConfigCommon.mk of the device tree.
+# Disabling through BoardConfig.mk or simular is not enabled.  To disable simply remove it if you have issues using it in the ROM builds
+# Anytime you enable/disable a feature the ROM source most be completely rebuilt clean.
+# Otherwise you are most likely to encounter problems with the ROM build.
+
+# To enable -O3 optimization flags put "OPT_A_LOT := true"
+# To enable -strict-aliasing flag put "MAKE_STRICT_GLOBAL := true"
+# To enable memory optimizations put "OPT_MEMORY := true"
+
+# Define standard optimization flags:
+# -Os = optimize for size, usefull for some parts of android such as thumb flags.  Otherwise code size can become huge.
+# -O2 = standard optimize, code size will not increase much.
+# -O3 = optimize the most, normally causes a log of bugs and huge code size unless some flags are disabled.
+# Highly experimental, use with extreme caution.
+# -fgcse-las & -fpredictive-commoning = memory optimization flags, does not increase code size.  gcse-las is not envoked by any -*O flags.
+# -fpredictive-commoning is enabled by default when using -O3.  So if using -O3 there's no need to pass it twice.
+
 OPT_OS := -Os
 OPT_O2 := -O2
 OPT_O3 := -O3
+OPT_MEM := -fgcse-las
+ifndef OPT_A_LOT
+OPT_MEM += -fpredictive-commoning
+endif
 
 # If fstrict-aliasing flag is global make warning level 3 automatic
 ifdef MAKE_STRICT_GLOBAL
@@ -100,12 +123,8 @@ TARGET_arm_CFLAGS +=    -Wstrict-aliasing=3 \
                         -Werror=strict-aliasing
 endif
 
-ifdef OPT_MEM
-TARGET_arm_CFLAGS +=    -fgcse-las \
-                        -fipa-pta
-ifndef OPT_A_LOT
-TARGET_arm_CFLAGS += -fpredictive-commoning
-endif
+ifdef OPT_MEMORY
+TARGET_arm_CFLAGS += $(OPT_MEM)
 endif
 
 # Modules can choose to compile some source as thumb.
@@ -132,12 +151,8 @@ TARGET_thumb_CFLAGS +=  -Wstrict-aliasing=3 \
                         -Werror=strict-aliasing
 endif
 
-ifdef OPT_MEM
-TARGET_thumb_CFLAGS +=  -fgcse-las \
-                        -fipa-pta
-ifndef OPT_A_LOT
-TARGET_thumb_CFLAGS += -fpredictive-commoning
-endif
+ifdef OPT_MEMORY
+TARGET_thumb_CFLAGS +=  $(OPT_MEM)
 endif
 
 # Set FORCE_ARM_DEBUGGING to "true" in your buildspec.mk
@@ -179,12 +194,8 @@ TARGET_GLOBAL_CFLAGS += -Wstrict-aliasing=3 \
                         -Werror=strict-aliasing
 endif
 
-ifdef OPT_MEM
-TARGET_GLOBAL_CFLAGS += -fgcse-las \
-                        -fipa-pta
-ifndef OPT_A_LOT
-TARGET_GLOBAL_CFLAGS += -fpredictive-commoning
-endif
+ifdef OPT_MEMORY
+TARGET_GLOBAL_CFLAGS += $(OPT_MEM)
 endif
 
 # This warning causes dalvik not to build with gcc 4.6+ and -Werror.
@@ -235,12 +246,8 @@ TARGET_RELEASE_CFLAGS += -Wstrict-aliasing=3 \
                          -Werror=strict-aliasing
 endif
 
-ifdef OPT_MEM
-TARGET_RELEASE_CFLAGS += -fgcse-las \
-                         -fipa-pta
-ifndef OPT_A_LOT
-TARGET_RELEASE_CFLAGS += -fpredictive-commoning
-endif
+ifdef OPT_MEMORY
+TARGET_RELEASE_CFLAGS += $(OPT_MEM)
 endif
 
 libc_root := bionic/libc
