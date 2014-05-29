@@ -142,14 +142,37 @@ ifeq ($(strip $(LOCAL_ENABLE_APROF)),true)
   LOCAL_CPPFLAGS += -fno-omit-frame-pointer -fno-function-sections -pg
 endif
 
+## begin graphite
 ifeq ($(strip $(ENABLE_GRAPHITE)),true)
-    ifneq ($(strip $(OPT_A_LOT)),true)
-        ifneq ($(strip $(LOCAL_DISABLE_GRAPHITE)),true)
-            LOCAL_CFLAGS += -fgraphite -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block
-            LOCAL_CPPFLAGS += -fgraphite -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block
-        endif
-    endif
+ifdef DISABLE_GRAPHTE_MODULES
+DISABLE_GRAPHTE_MODULES += libjni_filtershow_filters \
+	libstagefright_amrwbenc \
+	libFFTEm \
+	libwebviewchromium \
+	libstagefright_mp3dec \
+	libwebrtc_spl
+else
+DISABLE_GRAPHTE_MODULES := libjni_filtershow_filters \
+	libstagefright_amrwbenc \
+	libFFTEm \
+	libwebviewchromium \
+	libstagefright_mp3dec \
+	libwebrtc_spl
 endif
+endif
+
+ifeq ($(strip $(ENABLE_GRAPHITE)),true)
+ifeq ($(filter $(DISABLE_GRAPHTE_MODULES),$(LOCAL_MODULE)),)
+ifneq ($(strip $(OPT_A_LOT)),true)
+ifneq ($(strip $(LOCAL_DISABLE_GRAPHITE)),true)
+	LOCAL_CFLAGS += -fgraphite -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block
+	LOCAL_CPPFLAGS += -fgraphite -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block
+endif
+endif
+endif
+endif
+endif
+## end graphite
 
 ###########################################################
 ## Explicitly declare assembly-only __ASSEMBLY__ macro for
