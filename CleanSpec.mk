@@ -217,6 +217,9 @@ $(call add-clean-step, rm -rf $(PRODUCT_OUT)/system/build.prop)
 # 4.4.4
 $(call add-clean-step, rm -rf $(PRODUCT_OUT)/system/build.prop)
 
+# Clean kernel
+$(call add-clean-step, rm -rf $(PRODUCT_OUT)/obj/KERNEL_OBJ)
+
 # ************************************************
 # NEWER CLEAN STEPS MUST BE AT THE END OF THE LIST
 # ************************************************
