@@ -167,7 +167,6 @@ ifneq ($(OPT_A_LOT),true)
 endif
 endif
 endif
-endif
 ## end graphite
 
 ###########################################################

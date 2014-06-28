@@ -150,10 +150,15 @@ function setpaths()
         export ANDROID_EABI_TOOLCHAIN=$gccprebuiltdir/$toolchaindir
     fi
 
+
+    # defined in core/config.mk
+    targetgccversionarm=$(get_build_var TARGET_GCC_VERSION_ARM)
+    export TARGET_GCC_VERSION_ARM=$targetgccversionarm
+
     unset ARM_EABI_TOOLCHAIN ARM_EABI_TOOLCHAIN_PATH
     case $ARCH in
         arm)
-            export TARGET_GCC_VERSION_ARM=$targetgccverionarm
+            export TARGET_GCC_VERSION_ARM=$targetgccversionarm
             toolchaindir=arm/arm-eabi-$targetgccversionarm/bin
             if [ -d "$gccprebuiltdir/$toolchaindir" ]; then
                  export ARM_EABI_TOOLCHAIN="$gccprebuiltdir/$toolchaindir"
